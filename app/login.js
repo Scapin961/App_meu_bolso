@@ -1,9 +1,9 @@
 import React, { useState } from 'react'
+import { router } from "expo-router";
 import { StyleSheet, View, Text, TouchableOpacity, Alert, KeyboardAvoidingView, Platform } from 'react-native'
 import AppInput from '../src/components/AppInput'
 import AppButton from '../src/components/AppButton'
-import { router } from 'expo-router'
-import { signUp } from '../src/services/AuthService'
+import { signIn } from '../src/services/AuthService'
 
 function showAlert(title, message) {
     if (Platform.OS === 'web') globalThis.alert(`${title}\n${message}`)
@@ -13,49 +13,37 @@ function showAlert(title, message) {
 export default function Login() {
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
-    const [confirm, setConfirm] = useState('')
     const [loading, setLoading] = useState(false)
 
-    async function handleRegister() {
-        // console.log('Cadastrando usuário!', email, password, confirm);
-        if (!email.trim() || !password.trim() || !confirm.trim())
-            return showAlert('Atenção', 'Preencha todos os campos.');
-        if (password.length < 6)
-            return showAlert('Atenção',
-                'A senha deve ter no mínimo 6 caracteres.');
-        if (password !== confirm)
-            return showAlert('Atenção', 'As senhas não conferem.');
+    async function handleLogin() {
+        if (!email.trim() || !password)
+            return showAlert('Atenção', 'Informe seu email e senha.');
         try {
             setLoading(true);
-            const { error } = await signUp(email.trim(), password);
-            if (error) {
-                showAlert('Erro no cadastro', error.message);
-                console.log('Erro no cadastro', error.message);
-                return;
-            } else {
-                showAlert('Sucesso!', 'Conta criada com sucesso, faça login para continuar');
-                router.replace('/');
-            }
+            const { error } = await signIn(email.trim(), password);
+            if (error) return showAlert('Erro no login', error.message);
+            showAlert('Bem-vindo', 'Login realizado com sucesso.');
+            router.replace('/home');
         } catch (error) {
-            showAlert('Erro', error.message || 'Não foi possível criar a conta.');
+            showAlert('Erro', error.message || 'Não foi possível entrar.');
         } finally {
             setLoading(false);
         }
-    };
+    }
 
     return (
         <KeyboardAvoidingView style={styles.container}
-            behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+            behavior={ Platform.OS === 'ios' ? 'padding': undefined }
         >
             <View>
                 <Text style={styles.title}>
-                    Criar Nova Conta
+                    Meu Bolso
                 </Text>
                 <Text style={styles.subtitle}>
-                    Preencha os dados para começar
+                    Controle suas finanças. 
                 </Text>
-                <AppInput
-                    label='Email'
+                <AppInput 
+                    label='Email' 
                     placeholder='seu@email.com'
                     autoCapitalize='none'
                     keyboardType='email-address'
@@ -69,20 +57,13 @@ export default function Login() {
                     value={password}
                     onChangeText={setPassword}
                 />
-                <AppInput
-                    label='Confirmar Senha'
-                    secureTextEntry
-                    placeholder='********'
-                    value={confirm}
-                    onChangeText={setConfirm}
-                />
                 <AppButton
-                    title='Criar conta'
+                    title='Entrar'
                     loading={loading}
-                    onPress={handleRegister}
+                    onPress={handleLogin}
                 />
-                <TouchableOpacity onPress={() => router.push('/')}>
-                    <Text style={styles.link}>Voltar para login</Text>
+                <TouchableOpacity onPress={() => router.push('/register')}>
+                    <Text style={styles.link}>Criar nova conta</Text>
                 </TouchableOpacity>
             </View>
         </KeyboardAvoidingView>
