@@ -2,45 +2,87 @@ import React, { useState } from 'react'
 import { StyleSheet, View, Text, TouchableOpacity, Alert, KeyboardAvoidingView, Platform } from 'react-native'
 import AppInput from '../src/components/AppInput'
 import AppButton from '../src/components/AppButton'
+import { router } from 'expo-router'
+import { signUp } from '../src/services/AuthService'
 
+function showAlert(title, message) {
+    if (Platform.OS === 'web') globalThis.alert(`${title}\n${message}`)
+    else Alert.alert(title, message)
+}
 
 export default function Login() {
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
+    const [confirm, setConfirm] = useState('')
     const [loading, setLoading] = useState(false)
+
+    async function handleRegister() {
+        // console.log('Cadastrando usuário!', email, password, confirm);
+        if (!email.trim() || !password.trim() || !confirm.trim())
+            return showAlert('Atenção', 'Preencha todos os campos.');
+        if (password.length < 6)
+            return showAlert('Atenção',
+                'A senha deve ter no mínimo 6 caracteres.');
+        if (password !== confirm)
+            return showAlert('Atenção', 'As senhas não conferem.');
+        try {
+            setLoading(true);
+            const { error } = await signUp(email.trim(), password);
+            if (error) {
+                showAlert('Erro no cadastro', error.message);
+                console.log('Erro no cadastro', error.message);
+                return;
+            } else {
+                showAlert('Sucesso!', 'Conta criada com sucesso, faça login para continuar');
+                router.replace('/');
+            }
+        } catch (error) {
+            showAlert('Erro', error.message || 'Não foi possível criar a conta.');
+        } finally {
+            setLoading(false);
+        }
+    };
 
     return (
         <KeyboardAvoidingView style={styles.container}
-            behavior={ Platform.OS === 'ios' ? 'padding': undefined }
+            behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         >
             <View>
                 <Text style={styles.title}>
                     Criar Nova Conta
                 </Text>
                 <Text style={styles.subtitle}>
-                    Preencha os dados para começar 
+                    Preencha os dados para começar
                 </Text>
-                <AppInput 
+                <AppInput
                     label='Email'
                     placeholder='seu@email.com'
                     autoCapitalize='none'
-                    KeyboardType='email-address'
+                    keyboardType='email-address'
                     value={email}
                     onChangeText={setEmail}
                 />
                 <AppInput
                     label='Senha'
-                    securetextEntry
+                    secureTextEntry
                     placeholder='********'
                     value={password}
                     onChangeText={setPassword}
                 />
-                <AppButton
-                    title='Entrar'
-                    loading={loading}
+                <AppInput
+                    label='Confirmar Senha'
+                    secureTextEntry
+                    placeholder='Confirmar Senha'
+                    value={confirm}
+                    onChangeText={setConfirm}
                 />
-                <TouchableOpacity>
-                    <Text style={styles.link}>Criar nova conta</Text>
+                <AppButton
+                    title='Criar conta'
+                    loading={loading}
+                    onPress={handleRegister}
+                />
+                <TouchableOpacity onPress={() => router.push('/')}>
+                    <Text style={styles.link}>Voltar para login</Text>
                 </TouchableOpacity>
             </View>
         </KeyboardAvoidingView>

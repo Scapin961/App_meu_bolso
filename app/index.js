@@ -3,12 +3,32 @@ import { router } from "expo-router";
 import { StyleSheet, View, Text, TouchableOpacity, Alert, KeyboardAvoidingView, Platform } from 'react-native'
 import AppInput from '../src/components/AppInput'
 import AppButton from '../src/components/AppButton'
+import { signIn } from '../src/services/AuthService'
 
+function showAlert(title, message) {
+    if (Platform.OS === 'web') globalThis.alert(`${title}\n${message}`)
+    else Alert.alert(title, message)
+}
 
 export default function Login() {
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const [loading, setLoading] = useState(false)
+
+    async function handleLogin() {
+        if (!email.trim() || !password)
+            return showAlert('Atenção', 'Informe seu email e senha.');
+        try {
+            setLoading(true);
+            const { error } = await signIn(email.trim(), password);
+            if (error) return showAlert('Erro no login', error.message);
+            showAlert('Bem-vindo', 'Login realizado com sucesso.');
+        } catch (error) {
+            showAlert('Erro', error.message || 'Não foi possível entrar.');
+        } finally {
+            setLoading(false);
+        }
+    }
 
     return (
         <KeyboardAvoidingView style={styles.container}
@@ -25,13 +45,13 @@ export default function Login() {
                     label='Email' 
                     placeholder='seu@email.com'
                     autoCapitalize='none'
-                    KeyboardType='email-address'
+                    keyboardType='email-address'
                     value={email}
                     onChangeText={setEmail}
                 />
                 <AppInput
                     label='Senha'
-                    securetextEntry
+                    secureTextEntry
                     placeholder='********'
                     value={password}
                     onChangeText={setPassword}
@@ -39,6 +59,7 @@ export default function Login() {
                 <AppButton
                     title='Entrar'
                     loading={loading}
+                    onPress={handleLogin}
                 />
                 <TouchableOpacity onPress={() => router.push('/register')}>
                     <Text style={styles.link}>Criar nova conta</Text>

@@ -6,10 +6,10 @@ export default function AppInput( { label, error, ...props } ) {
         <View style={styles.container}>
             {label && <Text style={styles.label}>{label}</Text>}
             <TextInput 
-                styles={[styles.input, error && styles.errorInput]}
+                style={[styles.input, error && styles.errorInput]}
                 {...props}
                 placeholderTextColor={COLORS.muted}/>
-            {error && <Text styles={styles.error}>{error}</Text>}
+            {error && <Text style={styles.error}>{error}</Text>}
         </View>
     )
 }
