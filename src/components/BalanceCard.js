@@ -1,12 +1,12 @@
 import { Text, StyleSheet } from "react-native";
 import AppCard from "./AppCard";
-import { FormatCurrency } from '../utils/Format';
+import { formatCurrency } from '../utils/Format';
 
-export default function BalanceCard(){
+export default function BalanceCard({ balance = 0 }){
     return(
-        <AppCard styles={styles.card}>
+        <AppCard style={styles.card}>
             <Text style={styles.label}>Saldo Atual</Text>
-            <Text style={styles.value}>{FormatCurrency(balance)}</Text>
+            <Text style={styles.value}>{formatCurrency(balance)}</Text>
         </AppCard>
     );
 }
