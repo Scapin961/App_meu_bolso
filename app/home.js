@@ -1,11 +1,12 @@
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import AppButton from "../src/components/AppButton"
-import BalanceCard from "../src/components/BalanceCard"
+import BalanceCard from '../src/components/BalanceCard'
+import SummaryCard from '../src/components/SummaryCard'
 
 export default function Home() {
     return (
         <View style={styles.container}>
-            <View>
+            <View style={styles.header}>
                 <View>
                     <Text>Meu Bolso</Text>
                     <Text>Resumo Financeiro</Text>
@@ -15,31 +16,46 @@ export default function Home() {
                 </TouchableOpacity>
             </View>
 
-            <BalanceCard balance={1000000}/>
+            <BalanceCard balance={50000} />
 
             <AppButton
-                title= "Gerar relatório PDF"
+                title="Gerar relatório PDF"
             />
 
+            <View style={styles.row}>
+                <SummaryCard title="Receitas" value={10000} type="Receita"/>
+                <SummaryCard title="Despesas" value={5000} type="Despesa"/>
+            </View>
+
+            <Text style={styles.section}>Últimas transações</Text>
         </View>
-    )
+    );
 }
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: '#ffffff'
+        backgroundColor: '#f8f9fa',
+        padding: 24,
+        paddingTop: 60
     },
-
-    title: {
-        fontSize: 32,
-        fontWeight: '700',
-        color: '#2f3640'
+    header: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        paddingVertical: 16
     },
     profile: {
         color: '#008f72',
-        fontWeight: '700',
+        fontWeight: '700'
+    },
+    row: {
+        flexDirection: 'row',
+        marginHorizontal: -4
+    },
+    section: {
+        fontSize: 18,
+        fontWeight: '800',
+        marginVertical: 10
     }
-})
+});
